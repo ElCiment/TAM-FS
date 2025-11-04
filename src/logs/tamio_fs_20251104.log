@@ -1,0 +1,28 @@
+2025-11-04 16:09:41,263 - utils - INFO - ==================================================
+2025-11-04 16:09:41,264 - utils - INFO - Tamio FS - Démarrage de l'application
+2025-11-04 16:09:41,264 - utils - INFO - Fichier log: /home/runner/workspace/src/logs/tamio_fs_20251104.log
+2025-11-04 16:09:41,265 - utils - INFO - Version Python: 3.11.13 (main, Jun  3 2025, 18:38:25) [GCC 14.3.0]
+2025-11-04 16:09:41,265 - utils - INFO - Système d'exploitation: Linux 6.14.11
+2025-11-04 16:09:41,266 - utils - INFO - ==================================================
+2025-11-04 16:09:42,059 - utils - INFO - ==================================================
+2025-11-04 16:09:42,059 - utils - INFO - Tamio FS - Démarrage de l'application
+2025-11-04 16:09:42,060 - utils - INFO - Fichier log: /home/runner/workspace/src/logs/tamio_fs_20251104.log
+2025-11-04 16:09:42,060 - utils - INFO - Version Python: 3.11.13 (main, Jun  3 2025, 18:38:25) [GCC 14.3.0]
+2025-11-04 16:09:42,060 - utils - INFO - Système d'exploitation: Linux 6.14.11
+2025-11-04 16:09:42,060 - utils - INFO - ==================================================
+2025-11-04 11:10:43,057 - utils - INFO - ==================================================
+2025-11-04 11:10:43,058 - utils - INFO - Tamio FS - Démarrage de l'application
+2025-11-04 11:10:43,058 - utils - INFO - Fichier log: C:\Python-Script\tamio\Tamio Optimized\TamioFS\src\logs\tamio_fs_20251104.log
+2025-11-04 11:10:43,058 - utils - INFO - Version Python: 3.10.0 (tags/v3.10.0:b494f59, Oct  4 2021, 19:00:18) [MSC v.1929 64 bit (AMD64)]
+2025-11-04 11:10:43,058 - utils - INFO - Système d'exploitation: Windows 10
+2025-11-04 11:10:43,058 - utils - INFO - ==================================================
+2025-11-04 11:10:43,271 - config_manager - INFO - Configuration chargée avec succès : 14 clés
+2025-11-04 11:10:43,273 - config_manager - INFO - Configuration chargée avec succès : 9 clés
+2025-11-04 11:10:43,274 - config_manager - WARNING - Fichier devices.xml introuvable : c:\pos\xml\devices.xml
+2025-11-04 11:10:43,516 - utils - INFO - [SERVEUR] Nom PC depuis COMPUTERNAME: 'MAIN-PC'
+2025-11-04 11:10:43,568 - utils - INFO - [SERVEUR] Nom d'hôte affiché: 'MAIN-PC'
+2025-11-04 11:10:43,935 - utils - INFO - [SERVEUR] GUI_Font_Size chargé: '12'
+2025-11-04 11:10:43,945 - utils - INFO - [SERVEUR] GUI_List_Height chargé: '30'
+2025-11-04 11:10:44,314 - utils - INFO - [SERVEUR] Baud Rate chargé: '9600'
+2025-11-04 11:10:44,723 - utils - INFO - Application Tamio FS démarrée
+2025-11-04 11:10:52,129 - utils - INFO - Fermeture de l'application serveur

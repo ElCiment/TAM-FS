@@ -33,13 +33,6 @@ Tamio FS est une application desktop Windows qui facilite la configuration d'un 
 - **main.py**: Interface serveur optimisée
 - **station.py**: Interface station optimisée
 
-### Nouvelles fonctionnalités
-- ✅ **Validation des données en temps réel** (adresses IP, codes postaux, etc.)
-- 🔍 **Test de connectivité réseau** avant copie des fichiers
-- 📊 **Système de logging complet** avec fichiers de logs datés
-- 🛡️ **Gestion d'erreurs robuste** avec messages détaillés
-- 📈 **Suivi de progression** pour les opérations longues
-- 🎯 **Interface utilisateur améliorée** avec meilleurs retours visuels
 
 ## 📦 Prérequis
 
@@ -211,16 +204,6 @@ logger = setup_logging(log_level=logging.DEBUG)
 - Installer avec: `pip install pywin32`
 - Sur Linux/Mac: Fonctionnalité non disponible
 
-## 📄 Licence
-
-Ce projet est une version optimisée du système Tamio FS.
-
-## 🤝 Support
-
-Pour toute question ou problème:
-1. Consulter les logs dans le dossier `logs/`
-2. Vérifier la configuration réseau
-3. S'assurer que tous les prérequis sont installés
 
 ---
 

@@ -127,7 +127,6 @@ tamio-fs/
 ├── test_app.py            # Script de diagnostic
 ├── README.md              # Ce fichier
 ├── requirements.txt       # Dépendances Python
-├── replit.md              # Documentation projet
 └── logs/                  # Fichiers de logs (créé automatiquement)
     └── tamio_fs_YYYYMMDD.log
 ```

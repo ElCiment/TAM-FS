@@ -1,0 +1,2 @@
+actual_version_url=https://example.com/tamio/actual_version.txt
+download_url=https://example.com/tamio/TamioConfig.exe

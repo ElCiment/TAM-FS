@@ -20,11 +20,32 @@ ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
 
+
+def resource_path(relative_path):
+    """Retourne le chemin absolu vers une ressource, que l'application soit exécutée
+    depuis Python ou depuis un exe PyInstaller"""
+    try:
+        # PyInstaller stocke les fichiers dans un dossier temporaire
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(os.path.dirname(__file__))
+    return os.path.join(base_path, relative_path)
+
+
 class StationApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Tamio FS - Configuration Station POS")
         self.geometry("600x400")
+
+
+        ico_path = resource_path("tamio.ico")
+        try:
+            self.iconbitmap(ico_path)
+        except Exception as e:
+            print(f"Impossible de charger l'icône : {e}")
+        
+
         
         self.validator = DataValidator()
         self.config_manager = XMLConfigManager()
@@ -146,7 +167,7 @@ class StationApp(ctk.CTk):
         
         ctk.CTkButton(
             server_frame, 
-            text="Copier les fichiers de configuration",
+            text="Copy Config Files From SV",
             command=self.apply_ip_and_copy,
             height=35,
             font=("Arial", 14)
@@ -220,19 +241,19 @@ class StationApp(ctk.CTk):
             command=self.open_maintenance_window,
             height=35,
             font=("Arial", 13, "bold"),
-            fg_color="#1976d2",
-            hover_color="#1565c0"
+            fg_color="#c6860d",
+            hover_color="#e0b90d"
         ).pack(fill="x", pady=(10, 5), padx=5)
     
     def _create_system_config_button(self, parent):
         ctk.CTkButton(
             parent, 
-            text="⚙️ Config Auto PC",
+            text="⚙️ Tweak Windows",
             command=self.open_system_config_window,
             height=35,
             font=("Arial", 13, "bold"),
-            fg_color="#2ecc71",
-            hover_color="#27ae60"
+            fg_color="#e67e22",
+            hover_color="#f39c12"
         ).pack(fill="x", pady=(5, 10), padx=5)
     
     def open_maintenance_window(self):
@@ -574,6 +595,9 @@ class StationApp(ctk.CTk):
         
         ctk.CTkLabel(container, text="Cochez les options à appliquer, puis cliquez sur 'Exécuter'", 
                     font=("Arial", 12), text_color="gray").pack(pady=(0, 15))
+
+        ctk.CTkLabel(container, text="vous devez redemarrer apres pour que tout les changements fonctionne", 
+                    font=("Arial", 16), text_color="red").pack(pady=(0, 15))                     
         
         left_col = ctk.CTkFrame(container, fg_color="transparent")
         right_col = ctk.CTkFrame(container, fg_color="transparent")
@@ -592,7 +616,7 @@ class StationApp(ctk.CTk):
         
         options_right = [
             ("power_options", "Mode alimentation performance"),
-            ("restore_context_menu", "Rétablir menu contextuel classique"),
+            ("restore_context_menu", "Win10 right click menu sur Win11"),
         ]
         
         for key, label in options_left:
@@ -734,8 +758,8 @@ class StationApp(ctk.CTk):
                                    command=execute_config,
                                    font=("Arial", 14, "bold"),
                                    height=40,
-                                   fg_color="#2ecc71",
-                                   hover_color="#27ae60")
+                                   fg_color="#e67e22",
+                                   hover_color="#f39c12")
         execute_btn.pack(pady=20)
     
     def on_closing(self):

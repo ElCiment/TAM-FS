@@ -35,31 +35,54 @@ def tweak_taskbar(log_fn):
         log_fn(f"❌ Erreur configuration barre des tâches: {e}")
 
 def disable_windows_notifications(log_fn):
-    """Désactiver les notifications Windows"""
+    """Désactiver les notifications Windows fonctionnelles sur Windows 10/11"""
     try:
         import winreg
         
         log_fn("▶ Désactivation des notifications Windows...")
         
-        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER,
-                              r"Software\Microsoft\Windows\CurrentVersion\PushNotifications")
-        winreg.SetValueEx(key, "ToastEnabled", 0, winreg.REG_DWORD, 0)
-        winreg.CloseKey(key)
-        log_fn("✓ Notifications toast désactivées (utilisateur actuel)")
-        
+        # 1. Notifications toast et bulles (utilisateur actuel)
+        key_adv_path = r"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
         try:
-            key2 = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE,
-                                   r"Software\Policies\Microsoft\Windows\Explorer")
-            winreg.SetValueEx(key2, "DisableNotificationCenter", 0, winreg.REG_DWORD, 1)
-            winreg.CloseKey(key2)
-            log_fn("✓ Centre de notifications désactivé (tous les utilisateurs)")
-        except PermissionError:
-            log_fn("⚠️ Centre de notifications : nécessite droits administrateur")
+            key_adv = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_adv_path, 0, winreg.KEY_SET_VALUE)
+        except FileNotFoundError:
+            key_adv = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_adv_path)
         
-        log_fn("✅ Notifications Windows désactivées")
+        winreg.SetValueEx(key_adv, "EnableBalloonTips", 0, winreg.REG_DWORD, 0)        # Bulles
+        winreg.SetValueEx(key_adv, "ShowToastNotification", 0, winreg.REG_DWORD, 0)    # Toasts
+        winreg.CloseKey(key_adv)
+        log_fn("✓ Notifications toast et bulles désactivées (utilisateur actuel)")
+        
+        # 2. Expérience de bienvenue + conseils + astuces
+        key_cdm_path = r"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
+        try:
+            key_cdm = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_cdm_path, 0, winreg.KEY_SET_VALUE)
+        except FileNotFoundError:
+            key_cdm = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_cdm_path)
+        
+        winreg.SetValueEx(key_cdm, "SubscribedContent-310093Enabled", 0, winreg.REG_DWORD, 0)  # Bienvenue
+        winreg.SetValueEx(key_cdm, "SubscribedContent-338389Enabled", 0, winreg.REG_DWORD, 0)  # Conseils
+        winreg.SetValueEx(key_cdm, "SoftLandingEnabled", 0, winreg.REG_DWORD, 0)              # Suggestions
+        winreg.CloseKey(key_cdm)
+        log_fn("✓ Expérience de bienvenue et conseils désactivés")
+        
+        # 3. Suggestions de configuration
+        key_upe_path = r"Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement"
+        try:
+            key_upe = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_upe_path, 0, winreg.KEY_SET_VALUE)
+        except FileNotFoundError:
+            key_upe = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_upe_path)
+        
+        winreg.SetValueEx(key_upe, "ScoobeSystemSettingEnabled", 0, winreg.REG_DWORD, 0)
+        winreg.CloseKey(key_upe)
+        log_fn("✓ Suggestions de configuration désactivées")
+        
+        log_fn("✅ Toutes les notifications Windows désactivées pour l'utilisateur actuel")
         
     except Exception as e:
         log_fn(f"❌ Erreur désactivation notifications: {e}")
+
+
 
 def restore_context_menu(log_fn):
     """Rétablir le menu contextuel classique de Windows 10"""

@@ -40,7 +40,13 @@ echo [2/3] Compilation de l'application Tamio FS (src/app.py)...
 pyinstaller --onefile ^
             --windowed ^
             --collect-all customtkinter ^
-            --name "Tamio_FS" ^
+            --name "Tamio_Config" ^
+            --icon "tamio.ico" ^
+            --add-data "tamio.ico;." ^
+            --add-data "flush.exe;." ^
+            --add-data "xml_extractor.exe;." ^
+            --add-data "versions.txt;."
+            --add-data "download.txt;."
             --noconfirm ^
             src/app.py
 
@@ -59,18 +65,4 @@ echo ========================================
 echo  COMPILATION TERMINEE !
 echo ========================================
 echo.
-echo Le fichier .exe est dans le dossier: dist\
-echo.
-echo  - Tamio_FS.exe  (Application unifiee - Serveur et Station)
-echo.
-echo Taille approximative: 50-80 MB
-echo.
-echo Pour tester:
-echo   cd dist
-echo   Tamio_FS.exe
-echo.
-echo Au demarrage, vous pourrez choisir entre:
-echo   - Mode Serveur
-echo   - Mode Station
-echo.
-pause
+

@@ -1,0 +1,59 @@
+
+pour le nom du pc il ne met toujours pas le nom actuel par defaut..  dans un autre code que j'ai , jai ca qui fonctionne peut etre peut tu ten inspirer?
+
+
+
+        #ctk.CTkLabel(opt_frame, 
+        #             text=f"🖥️ Nom PC actuel : {current_pc_name}",
+        #             font=ctk.CTkFont(size=10),
+        #             text_color="#a5d6ff").pack(anchor="w", padx=8, pady=(2,4))
+
+        ctk.CTkCheckBox(opt_frame, text="Renommer PC:",
+                        variable=rename_var).pack(anchor="w", padx=8, pady=1)
+        ctk.CTkEntry(opt_frame,
+                     textvariable=pc_name_var,
+                     placeholder_text="Nom",
+                     width=140,
+                     height=24).pack(anchor="w", padx=8, pady=1)
+
+        ctk.CTkCheckBox(opt_frame,
+                        text="Redémarrer auto",
+                        variable=restart_var).pack(anchor="w",
+                                                   padx=8,
+                                                   pady=(2, 6))
+
+
+
+                   # Renommer PC
+                    if rename_var.get():
+                        new_name = pc_name_var.get().strip()
+                        if new_name:
+                            status_label_prog.configure(
+                                text="▶ Renommage du PC...")
+                            log_msg(f"▶ Renommage du PC en '{new_name}'...")
+                            try:
+                                rename_computer(new_name, self.log)
+                                log_msg("✅ PC renommé")
+                            except Exception as e:
+                                log_msg(f"❌ Erreur renommage: {e}")
+
+
+        # FORCER le nom actuel du PC dans le champ immédiatement
+        current_pc_name = os.environ.get("COMPUTERNAME", "")
+        if not self.pc_name_var.get() or self.pc_name_var.get() != current_pc_name:
+            self.pc_name_var.set(current_pc_name)
+
+        pc_entry = ctk.CTkEntry(rename_frame, width=250)
+        pc_entry.insert(0, current_pc_name)  # Forcer l'affichage direct
+        pc_entry.pack(side="left", padx=10)
+
+        # Synchroniser avec self.pc_name_var pour la suite
+        def sync_pc_name(*args):
+            self.pc_name_var.set(pc_entry.get())
+        pc_entry.bind('<KeyRelease>', sync_pc_name)
+		
+		
+		
+		
+		
+		et aussi les 2 champs  :   GUI_Font_Size="" GUI_List_Height="" ne sont pas lu ni mi a jour lors de changement .... ca doit faire comme les autre champs de la meme page qui fonctionne eu comem exemple:   Use_Floorplan="1"  Use_Retail="1" Use_Counter="1"

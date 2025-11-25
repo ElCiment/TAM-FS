@@ -313,21 +313,18 @@ class XMLConfigWizard(ctk.CTk):
     def create_page_mev(self):
         page = ctk.CTkFrame(self)
         ctk.CTkLabel(page, text="Informations MEV Web", font=("Arial", 20, "bold")).pack(pady=15)
-        
 
-     
-        
         scrollable = ctk.CTkScrollableFrame(page)
         scrollable.pack(fill="both", expand=True, padx=20, pady=(0, 20))
-        
+
         container = ctk.CTkFrame(scrollable, fg_color="transparent")
         container.pack(fill="both", expand=True)
-        
+
         left = ctk.CTkFrame(container)
         right = ctk.CTkFrame(container)
         left.pack(side="left", expand=True, fill="both", padx=15)
         right.pack(side="right", expand=True, fill="both", padx=15)
-        
+
         labels = {
             "MEV_UserName": "Nom commercial",
             "MEV_Gst": "TPS (9 chiffres)",
@@ -337,30 +334,29 @@ class XMLConfigWizard(ctk.CTk):
             "MEV_Address": "Adresse complète",
             "MEV_Zip": "Code postal",
             "MEV_Sector": "Secteur",
-            "MEV_Commerce_Name": "Nom sur l'entete de facture"
+            "MEV_Commerce_Name": "Nom sur l'entete de facture",
+            "MEV_Tel": "Téléphone sur le reçu"
         }
-        
+
         keys = list(labels.keys())
         mid = len(keys) // 2
-        
+
         for col, subset in [(left, keys[:mid]), (right, keys[mid:])]:
             for key in subset:
-                # 🔥 Décodage automatique pour tous les champs
                 value = self.decode_xml_escaped(self.mev_data.get(key, ""))
-                
+
                 ctk.CTkLabel(col, text=labels[key], font=("Arial", 12)).pack(anchor="w", pady=(8, 2))
-                
+
                 if key == "MEV_Sector":
                     cb = ctk.CTkComboBox(col, values=["RES", "BAR", "CDR"], width=120)
                     cb.set(value if value else "RES")
                     cb.pack(anchor="w", pady=(0, 5))
                     self.mev_fields[key] = cb
-                
+
                 elif key == "MEV_Address":
                     addr_frame = ctk.CTkFrame(col)
                     addr_frame.pack(pady=(0, 5), fill="x")
 
-                    # 🔥 On utilise la valeur déjà décodée
                     decoded_addr = value
                     addr_parts = decoded_addr.split(",")
 
@@ -394,6 +390,12 @@ class XMLConfigWizard(ctk.CTk):
                     e.pack(anchor="w", pady=(0, 5))
                     self.mev_fields[key] = e
 
+                elif key == "MEV_Tel":
+                    e = ctk.CTkEntry(col, width=100)
+                    e.insert(0, value)
+                    e.pack(anchor="w", pady=(0, 5))
+                    self.mev_fields[key] = e
+
                 elif key == "MEV_Commerce_Name":
                     e = ctk.CTkEntry(col, width=250, placeholder_text="Ex: Restaurant ABC")
                     e.insert(0, value)
@@ -407,6 +409,7 @@ class XMLConfigWizard(ctk.CTk):
                     self.mev_fields[key] = e
 
         self.pages.append(page)
+
 
 
     def create_page_printer(self):
@@ -922,6 +925,7 @@ class XMLConfigWizard(ctk.CTk):
                 
                 commerce_name = data_to_save.get("MEV_Commerce_Name", "")
                 postal_code = data_to_save.get("MEV_Zip", "")
+                phone = data_to_save.get("MEV_Tel", "")
                 
                 layout_updated = self.config_manager.update_layout_header(
                     commerce_name=commerce_name,
@@ -929,6 +933,7 @@ class XMLConfigWizard(ctk.CTk):
                     address_street=address_street,
                     city=address_city,
                     postal_code=postal_code
+                    phone=phone
                 )
                 
                 menu_updated = self.config_manager.ensure_receipt_printer_in_menu()

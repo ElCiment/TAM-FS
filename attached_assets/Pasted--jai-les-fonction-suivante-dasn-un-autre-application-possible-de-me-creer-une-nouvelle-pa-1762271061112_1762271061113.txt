@@ -1,0 +1,469 @@
+	
+		
+	jai les fonction suivante dasn un autre application ... possible de me creer une nouvelle page dasn serveur et dasn station aussi avec tout cest fonction?	
+		
+		
+		
+		
+		
+		
+		
+           def worker():
+                try:
+                    log_msg("===== AUTO SETUP: CONFIG PC =====")
+
+                    # Collecter les étapes Standard
+                    steps = []
+                    if standard_vars['taskbar'].get():
+                        steps.append(("Tweak barre des tâches",
+                                      lambda: tweak_taskbar(self.log)))
+                    if standard_vars['notifications'].get():
+                        steps.append(
+                            ("Désactivation notifications",
+                             lambda: disable_windows_notifications(self.log)))
+       
+
+                    # === NOUVELLES OPTIONS 1-8 ===
+
+                    # Option 1: Désactiver UAC
+                    if standard_vars['disable_uac'].get():
+                        steps.append(
+                            ("Désactivation UAC", lambda: self._disable_uac(log_msg)))
+
+
+                    # Option 3: Désactiver veille cartes réseau
+                    if standard_vars['disable_network_sleep'].get():
+                        steps.append(
+                            ("Désactivation veille réseau", lambda: self._disable_network_sleep(log_msg)))
+
+                    # Option 3b: Mettre carte réseau en mode Privé
+                    if standard_vars['network_private'].get():
+                        steps.append(
+                            ("Carte réseau en mode Privé", lambda: self._set_network_private(log_msg)))
+
+                    # Option 4: Fuseau horaire + sync
+                    if standard_vars['timezone_sync'].get():
+                        steps.append(
+                            ("Fuseau horaire + sync", lambda: self._set_timezone_and_sync(log_msg)))
+
+                    # Option 5: Meilleures performances
+                    if standard_vars['best_performance'].get():
+                        steps.append(
+                            ("Meilleures performances", lambda: self._set_best_performance(log_msg)))
+
+                    # Option 6: Mode alimentation performance
+                    if standard_vars['power_options'].get():
+                        steps.append(
+                            ("Mode alimentation performance", lambda: self._set_power_performance(log_msg)))
+
+                    # Gestion partage protégé par mot de passe (Option 7)
+                    # Vérifier si la checkbox est cochée
+                    if standard_vars['enable_password_sharing_config'].get():
+                        pw_action = standard_vars['password_sharing_action'].get()
+                        if pw_action == "Activer protection":
+                            steps.append(
+                                ("Activation partage protégé", lambda: self.
+                                 _enable_password_protected_sharing(log_msg)))
+                        elif pw_action == "Désactiver protection":
+                            steps.append(
+                                ("Désactivation partage protégé", lambda: self.
+                                 _disable_password_protected_sharing(log_msg)))
+
+                    # Option 8: Heures actives
+                    if standard_vars['active_hours'].get():
+                        start_h = standard_vars['active_hours_start'].get()
+                        end_h = standard_vars['active_hours_end'].get()
+                        steps.append(
+                            ("Configuration heures actives", 
+                             lambda sh=start_h, eh=end_h: self._set_active_hours(log_msg, sh, eh)))
+
+                    # Option 9: Installation Ninite
+                    if standard_vars['install_ninite'].get():
+                        steps.append(
+                            ("Installation Ninite + config VNC", lambda: self._install_ninite(log_msg)))
+
+                    # Option 10: Rétablir menu contextuel classique
+                    if standard_vars['restore_context_menu'].get():
+                        steps.append(
+                            ("Rétablir menu contextuel classique", lambda: restore_context_menu(log_msg)))		
+							
+							
+							
+							
+    def _disable_uac(self, log_fn):
+        """Option 1: Désactiver le contrôle de compte utilisateur (UAC)"""
+        try:
+            import winreg
+
+            log_fn("▶ Désactivation du contrôle de compte utilisateur (UAC)...")
+
+            # Modifier la clé de registre pour UAC
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System",
+                                0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key, "EnableLUA", 0, winreg.REG_DWORD, 0)
+            winreg.SetValueEx(key, "ConsentPromptBehaviorAdmin", 0, winreg.REG_DWORD, 0)
+            winreg.SetValueEx(key, "PromptOnSecureDesktop", 0, winreg.REG_DWORD, 0)
+            winreg.CloseKey(key)
+
+            log_fn("✓ Clés UAC modifiées (EnableLUA=0, ConsentPromptBehaviorAdmin=0)")
+            log_fn("✅ UAC désactivé")
+            log_fn("⚠️ Redémarrage requis pour appliquer les changements")
+
+        except Exception as e:
+            log_fn(f"❌ Erreur désactivation UAC: {e}")
+            log_fn("⚠️ Nécessite droits administrateur")
+
+
+
+    def _disable_network_sleep(self, log_fn):
+        """Option 3: Désactiver la mise en veille des cartes réseau"""
+        try:
+            log_fn("▶ Désactivation de la mise en veille des cartes réseau...")
+
+            # Utiliser PowerShell pour modifier les paramètres des adaptateurs réseau
+            ps_cmd = '''
+Get-NetAdapter | ForEach-Object {
+    $adapter = $_
+    $powerMgmt = Get-WmiObject MSPower_DeviceEnable -Namespace root\\wmi | Where-Object {$_.InstanceName -match [regex]::Escape($adapter.PnPDeviceID)}
+    if ($powerMgmt) {
+        $powerMgmt.Enable = $false
+        $powerMgmt.Put()
+        Write-Output "Désactivé pour: $($adapter.Name)"
+    }
+}
+'''
+
+            result = subprocess.run(['powershell', '-Command', ps_cmd],
+                                   capture_output=True, text=True, timeout=60)
+
+            if result.returncode == 0:
+                output_lines = result.stdout.strip().split('\n')
+                for line in output_lines:
+                    if line.strip():
+                        log_fn(f"  ✓ {line.strip()}")
+                log_fn("✅ Mise en veille des cartes réseau désactivée")
+            else:
+                log_fn("⚠️ Impossible de modifier certaines cartes réseau")
+                log_fn("   Essai avec méthode alternative...")
+
+                # Méthode alternative via netsh
+                subprocess.run('powercfg /change standby-timeout-ac 0', shell=True, timeout=10)
+                subprocess.run('powercfg /change standby-timeout-dc 0', shell=True, timeout=10)
+                log_fn("✓ Paramètres d'alimentation réseau modifiés")
+
+        except Exception as e:
+            log_fn(f"❌ Erreur désactivation veille réseau: {e}")
+            log_fn("⚠️ Nécessite droits administrateur")
+
+    def _set_timezone_and_sync(self, log_fn):
+        """Option 4: Configurer fuseau horaire America/Toronto et synchroniser"""
+        try:
+            log_fn("▶ Configuration du fuseau horaire et synchronisation...")
+
+            # Définir le fuseau horaire sur America/Toronto (Eastern Time)
+            cmd_tz = 'tzutil /s "Eastern Standard Time"'
+            result = subprocess.run(cmd_tz, capture_output=True, text=True, shell=True, timeout=10)
+
+            if result.returncode == 0:
+                log_fn("✓ Fuseau horaire défini sur America/Toronto (Eastern)")
+            else:
+                log_fn("⚠️ Erreur lors du changement de fuseau horaire")
+
+            # Forcer la synchronisation de l'heure
+            log_fn("  Synchronisation de l'heure en cours...")
+
+            # Arrêter le service W32Time
+            subprocess.run('net stop w32time', capture_output=True, shell=True, timeout=10)
+
+            # Configurer le service pour démarrer automatiquement
+            subprocess.run('sc config w32time start= auto', capture_output=True, shell=True, timeout=10)
+            log_fn("✓ Service de temps configuré en démarrage automatique")
+
+            # Redémarrer le service W32Time
+            subprocess.run('net start w32time', capture_output=True, shell=True, timeout=10)
+            log_fn("✓ Service de temps redémarré")
+
+            # Enregistrer le service avec le serveur de temps
+            subprocess.run('w32tm /register', capture_output=True, shell=True, timeout=10)
+
+            # Configurer les serveurs de temps NTP
+            time_servers = 'time.windows.com,time.nist.gov,pool.ntp.org'
+            subprocess.run(f'w32tm /config /manualpeerlist:"{time_servers}" /syncfromflags:manual /reliable:YES /update',
+                          capture_output=True, shell=True, timeout=15)
+            log_fn("✓ Serveurs de temps NTP configurés")
+
+            # Forcer la resynchronisation immédiate
+            result_sync = subprocess.run('w32tm /resync /force',
+                                        capture_output=True, text=True, shell=True, timeout=30)
+
+            if "successfully" in result_sync.stdout.lower() or result_sync.returncode == 0:
+                log_fn("✓ Heure synchronisée avec succès")
+            else:
+                log_fn("⚠️ La synchronisation peut prendre quelques instants")
+
+            # Activer la synchronisation automatique
+            subprocess.run('w32tm /config /update', capture_output=True, shell=True, timeout=10)
+            log_fn("✓ Synchronisation automatique activée")
+
+            log_fn("✅ Fuseau horaire et synchronisation configurés")
+
+        except Exception as e:
+            log_fn(f"❌ Erreur configuration fuseau horaire: {e}")
+
+    def _set_network_private(self, log_fn):
+        """Option 3b: Mettre la carte réseau en mode Privé (au lieu de Public)"""
+        try:
+            log_fn("▶ Configuration carte réseau en mode Privé...")
+
+            # PowerShell pour définir toutes les cartes réseau en mode Privé
+            ps_cmd = 'Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private'
+
+            result = subprocess.run(['powershell', '-Command', ps_cmd],
+                                  capture_output=True, text=True, timeout=30)
+
+            if result.returncode == 0:
+                log_fn("✓ Carte(s) réseau configurée(s) en mode Privé")
+                log_fn("✅ Configuration réseau Privé terminée")
+            else:
+                log_fn(f"⚠️ Résultat de la commande: {result.stderr.strip() if result.stderr else 'OK'}")
+                log_fn("✓ Commande exécutée (vérifier manuellement si nécessaire)")
+
+        except Exception as e:
+            log_fn(f"❌ Erreur configuration réseau Privé: {e}")
+            log_fn("⚠️ Configuration manuelle requise:")
+            log_fn("   Paramètres → Réseau → Propriétés → Profil réseau → Privé")
+
+    def _set_best_performance(self, log_fn):
+        """Option 5: Configurer les meilleures performances système"""
+        try:
+            import winreg
+
+            log_fn("▶ Configuration des meilleures performances système...")
+
+            # Modifier la clé de registre pour les performances visuelles
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                                r"Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects",
+                                0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key, "VisualFXSetting", 0, winreg.REG_DWORD, 2)  # 2 = Best Performance
+            winreg.CloseKey(key)
+
+            log_fn("✓ Paramètres de performances visuelles modifiés")
+
+            # Désactiver les animations
+            key2 = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                                 r"Control Panel\Desktop\WindowMetrics",
+                                 0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key2, "MinAnimate", 0, winreg.REG_SZ, "0")
+            winreg.CloseKey(key2)
+
+            log_fn("✓ Animations désactivées")
+            log_fn("✅ Meilleures performances configurées")
+            log_fn("⚠️ Redémarrage ou déconnexion/reconnexion recommandé")
+
+        except Exception as e:
+            log_fn(f"❌ Erreur configuration performances: {e}")
+
+    def _set_power_performance(self, log_fn):
+        """Option 6: Configurer le mode d'alimentation performance"""
+        try:
+            log_fn("▶ Configuration du mode d'alimentation performance...")
+
+            # Définir le mode de performance élevée
+            cmd_power = 'powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'  # GUID du mode Performance élevée
+            subprocess.run(cmd_power, capture_output=True, shell=True, timeout=10)
+            log_fn("✓ Mode alimentation 'Performance élevée' activé")
+
+            # Désactiver la mise en veille
+            subprocess.run('powercfg /change standby-timeout-ac 0', shell=True, timeout=10)
+            subprocess.run('powercfg /change standby-timeout-dc 0', shell=True, timeout=10)
+            log_fn("✓ Mise en veille désactivée")
+
+            # Jamais éteindre l'écran
+            subprocess.run('powercfg /change monitor-timeout-ac 0', shell=True, timeout=10)
+            subprocess.run('powercfg /change monitor-timeout-dc 0', shell=True, timeout=10)
+            log_fn("✓ Extinction automatique de l'écran désactivée")
+
+            # Arrêt du disque dur = 0
+            subprocess.run('powercfg /change disk-timeout-ac 0', shell=True, timeout=10)
+            subprocess.run('powercfg /change disk-timeout-dc 0', shell=True, timeout=10)
+            log_fn("✓ Arrêt automatique du disque dur désactivé")
+
+            log_fn("✅ Mode alimentation performance configuré")
+
+        except Exception as e:
+            log_fn(f"❌ Erreur configuration alimentation: {e}")
+			
+			
+			
+			
+    def _set_active_hours(self, log_fn, start_hour, end_hour):
+        """Option 8: Configurer les heures actives du système"""
+        try:
+            import winreg
+
+            log_fn(f"▶ Configuration des heures actives ({start_hour}h - {end_hour}h)...")
+
+            # Valider les heures
+            try:
+                start = int(start_hour)
+                end = int(end_hour)
+                if start < 0 or start > 23 or end < 0 or end > 23:
+                    log_fn("❌ Les heures doivent être entre 0 et 23")
+                    return
+                # Permettre les heures passant minuit (ex: 17h-5h est valide)
+                # Pas de vérification start >= end
+            except ValueError:
+                log_fn("❌ Format d'heure invalide")
+                return
+
+            # Modifier la clé de registre pour les heures actives
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                r"SOFTWARE\Microsoft\WindowsUpdate\UX\Settings",
+                                0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key, "ActiveHoursStart", 0, winreg.REG_DWORD, start)
+            winreg.SetValueEx(key, "ActiveHoursEnd", 0, winreg.REG_DWORD, end)
+            winreg.CloseKey(key)
+
+            if start >= end:
+                log_fn(f"✓ Heures actives définies: {start}h - {end}h (passant minuit)")
+            else:
+                log_fn(f"✓ Heures actives définies: {start}h - {end}h")
+            log_fn("✅ Heures actives configurées")
+            log_fn("   Windows ne redémarrera pas automatiquement pendant ces heures")
+
+        except Exception as e:
+            log_fn(f"❌ Erreur configuration heures actives: {e}")
+            log_fn("⚠️ Nécessite droits administrateur")
+
+
+
+
+    def _check_password_protected_sharing(self):
+        """Vérifie si le partage protégé par mot de passe est activé"""
+        try:
+            import winreg
+            # Vérifier la clé everyoneincludesanonymous
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                 r"SYSTEM\CurrentControlSet\Control\Lsa", 0,
+                                 winreg.KEY_READ)
+            value, _ = winreg.QueryValueEx(key, "everyoneincludesanonymous")
+            winreg.CloseKey(key)
+
+            # Si everyoneincludesanonymous = 1, le partage protégé est désactivé
+            # Si = 0 ou absent, le partage protégé est activé
+            return value == 0
+        except:
+            # Par défaut, considérer que le partage protégé est activé
+            return True
+
+    def _disable_password_protected_sharing(self, log_fn):
+        """Désactive le partage protégé par mot de passe"""
+        try:
+            import winreg
+
+            log_fn("▶ Désactivation du partage protégé par mot de passe...")
+
+            # Étape 1: Modifier everyoneincludesanonymous
+            key1 = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                  r"SYSTEM\CurrentControlSet\Control\Lsa", 0,
+                                  winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key1, "everyoneincludesanonymous", 0,
+                              winreg.REG_DWORD, 1)
+            winreg.CloseKey(key1)
+            log_fn("✓ Clé 'everyoneincludesanonymous' définie à 1")
+
+            # Étape 2: Modifier RestrictNullSessAccess
+            key2 = winreg.OpenKey(
+                winreg.HKEY_LOCAL_MACHINE,
+                r"SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters",
+                0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key2, "RestrictNullSessAccess", 0,
+                              winreg.REG_DWORD, 0)
+            winreg.CloseKey(key2)
+            log_fn("✓ Clé 'RestrictNullSessAccess' définie à 0")
+
+            ########
+
+            key3 = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                  r"SYSTEM\CurrentControlSet\Control\Lsa", 0,
+                                  winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key3, "ForceGuest", 0, winreg.REG_DWORD, 0)
+            winreg.CloseKey(key3)
+            log_fn("✓ Clé 'ForceGuest' définie à 0 (désactivé)")
+            ####
+
+            key4 = winreg.CreateKey(
+                winreg.HKEY_LOCAL_MACHINE,
+                r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System")
+            winreg.SetValueEx(key4, "LocalAccountTokenFilterPolicy", 0,
+                              winreg.REG_DWORD, 1)
+            winreg.CloseKey(key4)
+            log_fn(
+                "✓ Clé 'LocalAccountTokenFilterPolicy' définie à 1 (désactivé)"
+            )
+
+            log_fn("✅ Partage protégé par mot de passe désactivé")
+            log_fn(
+                "⚠️ Redémarrage ou déconnexion/reconnexion du réseau requis pour appliquer"
+            )
+
+        except Exception as e:
+            log_fn(f"❌ Erreur désactivation partage protégé: {e}")
+            log_fn("⚠️ Nécessite droits administrateur")
+
+    def _enable_password_protected_sharing(self, log_fn):
+        """Active le partage protégé par mot de passe"""
+        try:
+            import winreg
+
+            log_fn("▶ Activation du partage protégé par mot de passe...")
+
+            # Étape 1: Modifier everyoneincludesanonymous
+            key1 = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                  r"SYSTEM\CurrentControlSet\Control\Lsa", 0,
+                                  winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key1, "everyoneincludesanonymous", 0,
+                              winreg.REG_DWORD, 0)
+            winreg.CloseKey(key1)
+            log_fn("✓ Clé 'everyoneincludesanonymous' définie à 0")
+
+            # Étape 2: Modifier RestrictNullSessAccess
+            key2 = winreg.OpenKey(
+                winreg.HKEY_LOCAL_MACHINE,
+                r"SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters",
+                0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key2, "RestrictNullSessAccess", 0,
+                              winreg.REG_DWORD, 1)
+            winreg.CloseKey(key2)
+            log_fn("✓ Clé 'RestrictNullSessAccess' définie à 1")
+
+            #####
+
+            key3 = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                  r"SYSTEM\CurrentControlSet\Control\Lsa", 0,
+                                  winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key3, "ForceGuest", 0, winreg.REG_DWORD, 1)
+            winreg.CloseKey(key3)
+            log_fn("✓ Clé 'ForceGuest' définie à 1 (activé)")
+
+            ####
+
+            key4 = winreg.CreateKey(
+                winreg.HKEY_LOCAL_MACHINE,
+                r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System")
+            winreg.SetValueEx(key4, "LocalAccountTokenFilterPolicy", 0,
+                              winreg.REG_DWORD, 0)
+            winreg.CloseKey(key4)
+            log_fn(
+                "✓ Clé 'LocalAccountTokenFilterPolicy' définie à 0 (activé)")
+
+            log_fn("✅ Partage protégé par mot de passe activé")
+            log_fn(
+                "⚠️ Redémarrage ou déconnexion/reconnexion du réseau requis pour appliquer"
+            )
+
+        except Exception as e:
+            log_fn(f"❌ Erreur activation partage protégé: {e}")
+            log_fn("⚠️ Nécessite droits administrateur")
+

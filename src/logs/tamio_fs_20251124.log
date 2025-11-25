@@ -1,0 +1,65 @@
+2025-11-24 08:16:59,652 - utils - INFO - ==================================================
+2025-11-24 08:16:59,653 - utils - INFO - Tamio FS - Démarrage de l'application
+2025-11-24 08:16:59,653 - utils - INFO - Fichier log: C:\Python-Script\tamio\Tamio Optimized\TamioFS\src\logs\tamio_fs_20251124.log
+2025-11-24 08:16:59,653 - utils - INFO - Version Python: 3.10.0 (tags/v3.10.0:b494f59, Oct  4 2021, 19:00:18) [MSC v.1929 64 bit (AMD64)]
+2025-11-24 08:16:59,653 - utils - INFO - Système d'exploitation: Windows 10
+2025-11-24 08:16:59,653 - utils - INFO - ==================================================
+2025-11-24 08:17:00,373 - config_manager - INFO - Configuration chargée avec succès : 14 clés
+2025-11-24 08:17:00,374 - config_manager - INFO - Configuration chargée avec succès : 9 clés
+2025-11-24 08:17:00,375 - config_manager - WARNING - Fichier devices.xml introuvable : c:\pos\xml\devices.xml
+2025-11-24 08:17:00,548 - utils - INFO - [SERVEUR] Nom PC depuis COMPUTERNAME: 'MAIN-PC'
+2025-11-24 08:17:00,555 - utils - INFO - [SERVEUR] Nom d'hôte affiché: 'MAIN-PC'
+2025-11-24 08:17:00,800 - utils - INFO - [SERVEUR] GUI_Font_Size chargé: '12'
+2025-11-24 08:17:00,805 - utils - INFO - [SERVEUR] GUI_List_Height chargé: '30'
+2025-11-24 08:17:01,042 - utils - INFO - [SERVEUR] Baud Rate chargé: '9600'
+2025-11-24 08:17:01,372 - utils - INFO - Application Tamio FS démarrée
+2025-11-24 08:18:47,116 - utils - INFO - Fermeture de l'application serveur
+2025-11-24 08:26:46,607 - utils - INFO - ==================================================
+2025-11-24 08:26:46,607 - utils - INFO - Tamio FS - Démarrage de l'application
+2025-11-24 08:26:46,607 - utils - INFO - Fichier log: C:\Python-Script\tamio\Tamio Optimized\TamioFS\src\logs\tamio_fs_20251124.log
+2025-11-24 08:26:46,607 - utils - INFO - Version Python: 3.10.0 (tags/v3.10.0:b494f59, Oct  4 2021, 19:00:18) [MSC v.1929 64 bit (AMD64)]
+2025-11-24 08:26:46,607 - utils - INFO - Système d'exploitation: Windows 10
+2025-11-24 08:26:46,608 - utils - INFO - ==================================================
+2025-11-24 08:26:46,765 - config_manager - INFO - Configuration chargée avec succès : 3 clés
+2025-11-24 08:26:46,787 - utils - INFO - [STATION] Nom PC depuis COMPUTERNAME: 'MAIN-PC'
+2025-11-24 08:26:46,795 - utils - INFO - [STATION] Nom d'hôte affiché: 'MAIN-PC'
+2025-11-24 08:26:47,175 - utils - INFO - Application Station POS démarrée
+2025-11-24 08:26:56,204 - utils - INFO - Fermeture de l'application station
+2025-11-24 08:38:10,128 - utils - INFO - ==================================================
+2025-11-24 08:38:10,129 - utils - INFO - Tamio FS - Démarrage de l'application
+2025-11-24 08:38:10,129 - utils - INFO - Fichier log: C:\Python-Script\tamio\Tamio Optimized\TamioFS\src\logs\tamio_fs_20251124.log
+2025-11-24 08:38:10,129 - utils - INFO - Version Python: 3.10.0 (tags/v3.10.0:b494f59, Oct  4 2021, 19:00:18) [MSC v.1929 64 bit (AMD64)]
+2025-11-24 08:38:10,129 - utils - INFO - Système d'exploitation: Windows 10
+2025-11-24 08:38:10,129 - utils - INFO - ==================================================
+2025-11-24 08:38:10,204 - config_manager - INFO - Configuration chargée avec succès : 3 clés
+2025-11-24 08:38:10,213 - utils - INFO - [STATION] Nom PC depuis COMPUTERNAME: 'MAIN-PC'
+2025-11-24 08:38:10,221 - utils - INFO - [STATION] Nom d'hôte affiché: 'MAIN-PC'
+2025-11-24 08:38:10,567 - utils - INFO - Application Station POS démarrée
+2025-11-24 08:38:42,057 - utils - INFO - Fermeture de l'application station
+2025-11-24 08:39:28,061 - utils - INFO - ==================================================
+2025-11-24 08:39:28,061 - utils - INFO - Tamio FS - Démarrage de l'application
+2025-11-24 08:39:28,061 - utils - INFO - Fichier log: C:\Python-Script\tamio\Tamio Optimized\TamioFS\src\logs\tamio_fs_20251124.log
+2025-11-24 08:39:28,061 - utils - INFO - Version Python: 3.10.0 (tags/v3.10.0:b494f59, Oct  4 2021, 19:00:18) [MSC v.1929 64 bit (AMD64)]
+2025-11-24 08:39:28,061 - utils - INFO - Système d'exploitation: Windows 10
+2025-11-24 08:39:28,061 - utils - INFO - ==================================================
+2025-11-24 08:39:28,198 - config_manager - INFO - Configuration chargée avec succès : 3 clés
+2025-11-24 08:39:28,225 - utils - INFO - [STATION] Nom PC depuis COMPUTERNAME: 'MAIN-PC'
+2025-11-24 08:39:28,234 - utils - INFO - [STATION] Nom d'hôte affiché: 'MAIN-PC'
+2025-11-24 08:39:28,626 - utils - INFO - Application Station POS démarrée
+2025-11-24 08:39:47,501 - utils - INFO - Fermeture de l'application station
+2025-11-24 08:40:13,699 - utils - INFO - ==================================================
+2025-11-24 08:40:13,699 - utils - INFO - Tamio FS - Démarrage de l'application
+2025-11-24 08:40:13,699 - utils - INFO - Fichier log: C:\Python-Script\tamio\Tamio Optimized\TamioFS\src\logs\tamio_fs_20251124.log
+2025-11-24 08:40:13,699 - utils - INFO - Version Python: 3.10.0 (tags/v3.10.0:b494f59, Oct  4 2021, 19:00:18) [MSC v.1929 64 bit (AMD64)]
+2025-11-24 08:40:13,699 - utils - INFO - Système d'exploitation: Windows 10
+2025-11-24 08:40:13,699 - utils - INFO - ==================================================
+2025-11-24 08:40:13,772 - config_manager - INFO - Configuration chargée avec succès : 14 clés
+2025-11-24 08:40:13,773 - config_manager - INFO - Configuration chargée avec succès : 9 clés
+2025-11-24 08:40:13,773 - config_manager - WARNING - Fichier devices.xml introuvable : c:\pos\xml\devices.xml
+2025-11-24 08:40:13,910 - utils - INFO - [SERVEUR] Nom PC depuis COMPUTERNAME: 'MAIN-PC'
+2025-11-24 08:40:13,917 - utils - INFO - [SERVEUR] Nom d'hôte affiché: 'MAIN-PC'
+2025-11-24 08:40:14,130 - utils - INFO - [SERVEUR] GUI_Font_Size chargé: '12'
+2025-11-24 08:40:14,135 - utils - INFO - [SERVEUR] GUI_List_Height chargé: '30'
+2025-11-24 08:40:14,373 - utils - INFO - [SERVEUR] Baud Rate chargé: '9600'
+2025-11-24 08:40:14,722 - utils - INFO - Application Tamio FS démarrée
+2025-11-24 08:40:31,182 - utils - INFO - Fermeture de l'application serveur

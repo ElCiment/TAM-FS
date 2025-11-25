@@ -2,12 +2,18 @@ import logging
 import os
 import sys
 import platform
+import tempfile
 from datetime import datetime
 from typing import List
 import serial.tools.list_ports
 
 
-def setup_logging(log_dir: str = "logs", log_level: int = logging.DEBUG):
+def setup_logging(log_dir: str = None, log_level: int = logging.DEBUG):
+    # Utiliser %TEMP% si aucun dossier n'est donné
+    if log_dir is None:
+        temp_dir = tempfile.gettempdir()  # Ex: C:\Users\xxx\AppData\Local\Temp
+        log_dir = os.path.join(temp_dir, "tamio_logs")
+
     if not os.path.exists(log_dir):
         os.makedirs(log_dir, exist_ok=True)
     

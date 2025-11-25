@@ -1,2 +1,2 @@
-actual_version_url=https://example.com/tamio/actual_version.txt
-download_url=https://example.com/tamio/TamioConfig.exe
+actual_version_url=https://raw.githubusercontent.com/ElCiment/TAM-FS/main/Actual_version.txt
+download_url=https://github.com/ElCiment/TAM-FS/releases/download/version/Tamio_Config.exe

@@ -19,12 +19,17 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+def get_real_executable_path():
+    """Retourne le vrai chemin de l'executable (pas le dossier temporaire PyInstaller)"""
+    if getattr(sys, 'frozen', False):
+        return os.path.abspath(sys.argv[0])
+    else:
+        return os.path.abspath(__file__)
+
+
 def get_app_dir():
     """Retourne le repertoire de l'executable ou du script"""
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable)
-    else:
-        return os.path.abspath(os.path.dirname(__file__))
+    return os.path.dirname(get_real_executable_path())
 
 
 def get_config_file_path(filename):
@@ -139,25 +144,6 @@ class UpdateDownloader:
         self.cancelled = True
 
 
-def create_update_batch_script(current_exe, new_exe):
-    """Cree un script batch pour remplacer l'exe et relancer l'application"""
-    batch_content = f'''@echo off
-echo Mise a jour de Tamio Config en cours...
-timeout /t 2 /nobreak > NUL
-taskkill /F /IM "{os.path.basename(current_exe)}" > NUL 2>&1
-timeout /t 1 /nobreak > NUL
-del "{current_exe}"
-move "{new_exe}" "{current_exe}"
-echo Mise a jour terminee. Demarrage de l'application...
-start "" "{current_exe}"
-del "%~f0"
-'''
-    batch_path = os.path.join(get_app_dir(), "_update_tamio.bat")
-    with open(batch_path, 'w', encoding='utf-8') as f:
-        f.write(batch_content)
-    return batch_path
-
-
 class UpdateDialog(ctk.CTkToplevel):
     """Fenetre de dialogue pour la mise a jour"""
     
@@ -237,8 +223,10 @@ class UpdateDialog(ctk.CTkToplevel):
         self.progress_bar.set(0)
         self.progress_label.pack()
         
-        app_dir = get_app_dir()
-        self.new_exe_path = os.path.join(app_dir, "TamioConfig_new.exe")
+        import tempfile
+        temp_dir = tempfile.gettempdir()
+        self.new_exe_path = os.path.join(temp_dir, "Tamio_Config_update.exe")
+        self.original_exe_path = get_real_executable_path()
         
         self.downloader = UpdateDownloader(
             self.download_url,
@@ -271,22 +259,42 @@ class UpdateDialog(ctk.CTkToplevel):
         self.after(0, complete)
     
     def execute_update(self):
-        """Execute la mise a jour (remplace l'exe et relance)"""
+        """Execute la mise a jour via un script cache dans TEMP"""
         try:
-            if getattr(sys, 'frozen', False):
-                current_exe = sys.executable
-            else:
+            if not getattr(sys, 'frozen', False):
                 messagebox.showinfo("Info", "Mise a jour telechargee.\nEn mode developpement, le remplacement automatique n'est pas disponible.")
                 self.destroy()
                 return
             
-            batch_path = create_update_batch_script(current_exe, self.new_exe_path)
+            import tempfile
+            temp_dir = tempfile.gettempdir()
+            batch_path = os.path.join(temp_dir, "_tamio_updater.bat")
             
-            if os.name == 'nt':
-                subprocess.Popen(
-                    ['cmd', '/c', batch_path],
-                    creationflags=subprocess.CREATE_NO_WINDOW
-                )
+            original_exe = self.original_exe_path
+            new_exe = self.new_exe_path
+            exe_name = os.path.basename(original_exe)
+            exe_dir = os.path.dirname(original_exe)
+            
+            batch_content = f'''@echo off
+echo Mise a jour en cours...
+start "" "{new_exe}"
+timeout /t 5 /nobreak >nul
+taskkill /F /IM "{exe_name}" >nul 2>&1
+:waitloop
+tasklist /FI "IMAGENAME eq {exe_name}" 2>NUL | find /I "{exe_name}" >nul
+if "%ERRORLEVEL%"=="0" (
+    timeout /t 1 /nobreak >nul
+    goto waitloop
+)
+copy /Y "{new_exe}" "{original_exe}" >nul
+del "{new_exe}" >nul 2>&1
+del /F /Q "%~f0"
+'''
+            
+            with open(batch_path, 'w', encoding='utf-8') as f:
+                f.write(batch_content)
+            
+            subprocess.Popen(batch_path, shell=True)
             
             self.destroy()
             self.master.destroy()
